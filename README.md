@@ -8,5 +8,18 @@ This is focusing on "Offenses Known to Law Enforcement by State by City"
 
 This is a basic scraper to create CSV files, broken down by year and state. 
 
-[FBI: Crime in the U.S.](https://ucr.fbi.gov/crime-in-the-u.s)
+Source -- [FBI: Crime in the U.S.](https://ucr.fbi.gov/crime-in-the-u.s)
+
+From there, click on a year, then click "Crime in the U.S." and find "Table 8," which often is listed under something 
+like "How many crimes came to the attention of law enforcement in my city in 20xx?"
+
+1995 - 2004 are available in Excel files, and will be imported later.
+
+2015 isn't available yet, as of August 8, 2016.
+
+Everything in the output/ directory comes from running the python script
+
+>scrape_offenses_by_state_by_city_2005-2014.py
+
+You can run it yourself if you really want, but prolly easiest to just use what's here. :)
 
