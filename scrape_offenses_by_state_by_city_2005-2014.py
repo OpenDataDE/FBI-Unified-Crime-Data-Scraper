@@ -16,22 +16,6 @@ import urlparse
 current_dir = os.path.dirname(os.path.realpath(__file__))
 
 
-state_list = [("Alabama", "Alabama"), ("Alaska", "Alaska"), ("Arizona", "Arizona"), ("Arkansas", "Arkansas"), \
-("California", "California"), ("Colorado", "Colorado"), ("Connecticut", "Connecticut"), \
-("Delaware", "Delaware"), ("District of Columbia", "District of Columbia"), ("Florida", "Florida"), \
-("Georgia", "Georgia"), ("Hawaii", "Hawaii"), \
-("Idaho", "Idaho"), ("Illinois", "Illinois"), ("Indiana", "Indiana"), ("Iowa", "Iowa"), ("Kansas", "Kansas"), \
-("Kentucky", "Kentucky"), ("Louisiana", "Louisiana"), ("Maine", "Maine"), ("Marshall Islands", "Marshall Islands"), \
-("Maryland", "Maryland"), ("Massachusetts", "Massachusetts"), ("Michigan", "Michigan"), ("Minnesota", "Minnesota"), \
-("Mississippi", "Mississippi"), ("Missouri", "Missouri"), ("Montana", "Montana"), ("Nebraska", "Nebraska"), \
-("Nevada", "Nevada"), ("New Hampshire", "New Hampshire"), ("New Jersey", "New Jersey"), ("New Mexico", "New Mexico"), \
-("New York", "New York"), ("North Carolina", "North Carolina"), ("North Dakota", "North Dakota"), ("Ohio", "Ohio"), \
-("Oklahoma", "Oklahoma"), ("Oregon", "Oregon"), ("Pennsylvania", "Pennsylvania"), ("Puerto Rico", "Puerto Rico"), \
-("Rhode Island", "Rhode Island"), ("South Carolina", "South Carolina"), ("South Dakota", "South Dakota"), \
-("Tennessee", "Tennessee"), ("Texas", "Texas"), ("Utah", "Utah"), ("Vermont", "Vermont"), ("Virginia", "Virginia"), \
-("Washington", "Washington"), ("West Virginia", "West Virginia"), \
-("Wisconsin", "Wisconsin"), ("Wyoming", "Wyoming")]
-
 
 state_names_list = ["Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", \
 "Delaware", "District of Columbia", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", \
@@ -39,11 +23,18 @@ state_names_list = ["Alabama", "Alaska", "Arizona", "Arkansas", "California", "C
 "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", \
 "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", \
 "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", \
-"Washington", "West Virginia", "Wisconsin", "Wyoming", "District Of Columbia"]
+"Washington", "West Virginia", "Wisconsin", "Wyoming"]
 
 
 # For testing
 #state_names_list = ["Alabama"]
+
+
+# For states that were sometimes labeled differently / incorrectly
+state_name_replacements = {
+    "District Of Columbia": "District of Columbia",
+    "Massachuetts": "Massachusetts"
+}
 
 
 
@@ -87,49 +78,54 @@ for year in offenses_links_by_year:
 
     for link in state_links_html.find_all('a'):
         #print dir(state_link)
-        if link.text in state_names_list:
+        if link.text in state_names_list or link.text in state_name_replacements:
 
-            state_csv_file_output = year_dir+'/'+link.text.replace(' ', '_')+'.csv'
+            state_text = link.text
+            if link.text in state_name_replacements:
+                state_text = state_name_replacements[link.text]
 
+            state_csv_file_output = year_dir+'/'+state_text.replace(' ', '_')+'.csv'
 
-            print link.text
-            state_url = link.get('href')
+            if not os.path.exists(state_csv_file_output):
 
-            if state_url[:2] != 'ht':
-                state_url = url_for_relative_links+state_url
+                print link.text
+                state_url = link.get('href')
 
-            r = requests.get(state_url, allow_redirects=False)
+                if state_url[:2] != 'ht':
+                    state_url = url_for_relative_links+state_url
 
-            state_data_html = BeautifulSoup(r.content)
+                r = requests.get(state_url, allow_redirects=False)
 
-            state_data = []
-            #strIO = StringIO.StringIO()
-            #writer = csv.writer(strIO)
+                state_data_html = BeautifulSoup(r.content)
 
-            with open(state_csv_file_output, 'w') as csvfile:
-                csv_writer = csv.writer(csvfile, dialect='excel', delimiter=',', lineterminator='\r\n', \
-                    quotechar = '"', quoting=csv.QUOTE_ALL)
+                state_data = []
+                #strIO = StringIO.StringIO()
+                #writer = csv.writer(strIO)
 
-                for tr in state_data_html.find_all('tr'):
-                    row = []
+                with open(state_csv_file_output, 'w') as csvfile:
+                    csv_writer = csv.writer(csvfile, dialect='excel', delimiter=',', lineterminator='\r\n', \
+                        quotechar = '"', quoting=csv.QUOTE_ALL)
 
-                    for th in tr.find_all('th'):
-                        #print th
-                        row.append(th.text.encode('utf-8').strip())
+                    for tr in state_data_html.find_all('tr'):
+                        row = []
 
-                    for td in tr.find_all('td'):
-                        #print td
-                        row.append(td.text.encode('utf-8').strip())
+                        for th in tr.find_all('th'):
+                            #print th
+                            row.append(th.text.encode('utf-8').strip())
 
-                    state_data.append(row)
-                    #writer.writerow(row)
-                    csv_writer.writerow(row)
+                        for td in tr.find_all('td'):
+                            #print td
+                            row.append(td.text.encode('utf-8').strip())
 
-                #strIO.seek(0)
+                        state_data.append(row)
+                        #writer.writerow(row)
+                        csv_writer.writerow(row)
 
-                #state_csv = open(state_csv_file_output, 'w')
+                    #strIO.seek(0)
 
-                csvfile.close()
+                    #state_csv = open(state_csv_file_output, 'w')
+
+                    csvfile.close()
 
             #print state_data
 

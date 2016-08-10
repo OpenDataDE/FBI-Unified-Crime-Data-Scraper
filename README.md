@@ -13,6 +13,8 @@ Source -- [FBI: Crime in the U.S.](https://ucr.fbi.gov/crime-in-the-u.s)
 From there, click on a year, then click "Crime in the U.S." and find "Table 8," which often is listed under something 
 like "How many crimes came to the attention of law enforcement in my city in 20xx?"
 
+For some reason, Hawaii is missing from 2011 through 2014.
+
 1995 - 2004 are available in Excel files, and will be imported later.
 
 2015 isn't available yet, as of August 8, 2016.
